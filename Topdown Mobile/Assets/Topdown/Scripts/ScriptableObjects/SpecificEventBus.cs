@@ -1,15 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 using System.Linq;
+using System;
 
-public class BaseTopic<T> : ScriptableObject
+public interface IBaseEventReceiver {
+    public UniqueId Id { get; }
+}
+
+public interface IEventReceiver<T> : IBaseEventReceiver {
+    void OnEvent(T ev);
+}
+
+public class SpecificEventBus<T>
 {
-    private readonly List<WeakReference<IEventReceiver<T>>> _receivers = new List<WeakReference<IEventReceiver<T>>>();
-    private readonly Dictionary<string, WeakReference<IEventReceiver<T>>> _receiverHashToReference = new Dictionary<string, WeakReference<IEventReceiver<T>>>();
+    private readonly List<WeakReference<IEventReceiver<T>>> _receivers;
+    private readonly Dictionary<string, WeakReference<IEventReceiver<T>>> _receiverHashToReference;
 
-    public void Register(IEventReceiver<T> receiver)
+
+    public SpecificEventBus() {
+        this._receivers = new List<WeakReference<IEventReceiver<T>>>();
+        _receiverHashToReference = new Dictionary<string, WeakReference<IEventReceiver<T>>>();
+    }
+
+     public void Register(IEventReceiver<T> receiver)
     {
         if (!_receiverHashToReference.TryGetValue(receiver.Id, out WeakReference<IEventReceiver<T>> reference))
         {
