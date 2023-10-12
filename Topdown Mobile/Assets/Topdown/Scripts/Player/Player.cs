@@ -12,5 +12,9 @@ public class Player : MonoBehaviour
 
     void Update() {
         _character.SetSpeed(_joystick.Direction);
-    }    
+    }
+
+    public void Fire() {
+        _character.Fire();
+    }
 }

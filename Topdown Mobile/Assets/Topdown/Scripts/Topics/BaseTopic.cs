@@ -4,8 +4,10 @@ using UnityEngine;
 using System;
 using System.Linq;
 
-public class BaseTopic<T> : ScriptableObject
+public class BaseTopic<T> : MonoBehaviour
 {
+    [SerializeField] public string _title;
+
     private readonly List<WeakReference<IEventReceiver<T>>> _receivers = new List<WeakReference<IEventReceiver<T>>>();
     private readonly Dictionary<string, WeakReference<IEventReceiver<T>>> _receiverHashToReference = new Dictionary<string, WeakReference<IEventReceiver<T>>>();
 
