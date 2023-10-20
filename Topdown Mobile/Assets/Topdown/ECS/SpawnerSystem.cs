@@ -28,6 +28,12 @@ public partial struct SpawnerSystem : ISystem
         {
             ProcessSpawner(ref state, spawner);
         }
+
+        foreach (SpawnerGO spawner in SystemAPI.Query<SpawnerGO>())
+        {
+            ProcessSpawner(ref state, spawner);
+        }
+
     }
 
     private void ProcessSpawner(ref SystemState state, RefRW<Spawner> spawner)
@@ -52,6 +58,33 @@ public partial struct SpawnerSystem : ISystem
 
             // Resets the next spawn time.
             spawner.ValueRW.NextSpawnTime = (float)SystemAPI.Time.ElapsedTime + spawner.ValueRO.SpawnRate;
+        }
+    }
+
+    private void ProcessSpawner(ref SystemState state, SpawnerGO spawner)
+    {
+        var ecb = SystemAPI.GetSingleton<BeginFixedStepSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged);
+        // If the next spawn time has passed.
+        if (spawner.NextSpawnTime < SystemAPI.Time.ElapsedTime)
+        {
+            UnityEngine.Debug.Log("Process, instantiate");
+            // Spawns a new entity and positions it at the spawner.
+            // Entity newEntity = ecb.Instantiate(spawner.ValueRO.Prefab);
+            // NewEnt
+            Entity newEntity = state.EntityManager.Instantiate(new Entity());
+            // Entity newEntity = state.EntityManager.Instantiate(spawner.Prefab);
+            // GameObject.Instantiate(spawner.ValueRO.Prefab);
+            // LocalPosition.FromPosition returns a Transform initialized with the given position.
+            // state.EntityManager.SetComponentData(newEntity, 
+            //     new Translation { Value = new float3(Random.N)}
+            // );
+            // state.EntityManager.SetComponentData(newEntity, LocalTransform.FromPosition(spawner.ValueRO.SpawnPosition));
+            state.EntityManager.SetComponentData(newEntity, LocalTransform.FromPosition(random.NextFloat3(
+                
+            )));
+
+            // Resets the next spawn time.
+            // spawner.ValueRW.NextSpawnTime = (float)SystemAPI.Time.ElapsedTime + spawner.SpawnRate;
         }
     }
 }
