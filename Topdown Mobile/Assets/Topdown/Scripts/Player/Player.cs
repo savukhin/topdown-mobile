@@ -20,7 +20,14 @@ public class Player : BasePlayer
     }
 
     void Update() {
-        _character.SetSpeed(_joystick.Direction);
+        #if UNITY_ANDROID 
+            _character.SetSpeed(_joystick.Direction);
+        #else
+            float x = Input.GetAxis("Horizontal");
+            float y = Input.GetAxis("Vertical");
+
+            _character.SetSpeed(new Vector2(x, y));
+        #endif
     }
 
     void Fire() {

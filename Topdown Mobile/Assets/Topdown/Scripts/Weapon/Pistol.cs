@@ -8,9 +8,19 @@ public class Pistol : IWeapon
     [SerializeField]
     private Vector3 _firePoint;
 
+    [SerializeField]
+    private float _fireDelaySec = 0.5f;
+
+    private float desiredShotTime = 0;
+
     public override void Fire(Character character)
     {
-        Debug.Log("Fire pistol");
+        if (Time.time < desiredShotTime) {
+            return;
+        }
+
+        desiredShotTime = Time.time + _fireDelaySec;
+        
         Instantiate(_bullet, getBulletStartPosition(), getBulletStartRotation());
     }
 

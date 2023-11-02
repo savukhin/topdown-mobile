@@ -42,7 +42,7 @@ public class Character : MonoBehaviour
         Vector3 dir = new (direction.x, 0, direction.y);
         animator.SetFloat("Speed", dir.magnitude);
 
-        rigidbody.MovePosition(transform.position + dir * Time.deltaTime * m_Speed);
+        rigidbody.MovePosition(transform.position + dir * m_Speed * WorldTimeSystem.GetDeltaTime());
         // _rigidbody.MoveRotation(transform.position + dir * Time.deltaTime * m_Speed);
         // transform.LookAt(transform, transform.position + dir);
         if (dir.magnitude > 0) {

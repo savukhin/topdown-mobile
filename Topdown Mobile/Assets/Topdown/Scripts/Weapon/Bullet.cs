@@ -11,21 +11,10 @@ public class Bullet : IBullet
 
     void Awake() {
         _rigidbody = GetComponent<Rigidbody>();
-        _rigidbody.velocity = transform.forward * _speed;
-
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        var enemy = other.GetComponent<Enemy>();
-        var basePlayer = other.GetComponent<BasePlayer>();
-        var character = other.GetComponent<Character>();
-        Debug.Log("enemy" + enemy);
-        Debug.Log("basePlayer" + basePlayer);
-        Debug.Log("character" + character);
-        Debug.Log("id " + other.name);
-        Debug.Log("id2 " + other.gameObject.name);
-        Debug.Log("this " + this.name);
+    void Update() {
+        _rigidbody.MovePosition(transform.position + transform.forward.normalized * _speed * WorldTimeSystem.GetDeltaTime());
     }
 
     void OnCollisionEnter(Collision collision)
