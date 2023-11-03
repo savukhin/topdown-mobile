@@ -9,6 +9,8 @@ public class Bullet : IBullet
     private int damage = 10;
     private Rigidbody _rigidbody;
 
+    private CharacterTag _characterTag = CharacterTag.Enemy;
+
     void Awake() {
         _rigidbody = GetComponent<Rigidbody>();
     }
@@ -17,12 +19,35 @@ public class Bullet : IBullet
         _rigidbody.MovePosition(transform.position + transform.forward.normalized * _speed * WorldTimeSystem.GetDeltaTime());
     }
 
-    void OnCollisionEnter(Collision collision)
-    {
-        Character character = collision.collider.GetComponent<Character>();
-        if (character != null) {
+    bool IsTakingDamage(CharacterTag other) {
+        if (other == _characterTag)
+            return false;
+        if (other == CharacterTag.NPC)
+            return false;
+
+        return true;
+    }
+
+    void ProcessCollider(Collider collider) {
+        Character character = collider.GetComponent<Character>();
+        if (character != null && IsTakingDamage(character.Tag.Value)) {
             character.TakeDamage(damage);
+        } else if (character != null) {
+            return; // If we hit character which cannot be damaged we just skip
         }
         Destroy(gameObject);
+    }
+
+    void OnTriggerEnter(Collider collider) {
+       ProcessCollider(collider);
+    }
+
+    void OnCollisionEnter(Collision collision) {
+        ProcessCollider(collision.collider);
+    }
+
+    public override void SetCharacterTag(CharacterTag tag)
+    {
+        _characterTag = tag;
     }
 }

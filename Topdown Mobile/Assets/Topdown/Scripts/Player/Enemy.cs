@@ -17,6 +17,13 @@ public class Enemy : BasePlayer
         Chosen.Subscribe(x => {
             _spotlightGO.SetActive(x);
         });
+
+        GetCurrentHP().
+            Subscribe(hp => {
+                if (hp <= 0) Destroy(gameObject);
+        });
+
+        _character.Tag.Value = CharacterTag.Enemy;
     }
 
     IEnumerator FireRate() {

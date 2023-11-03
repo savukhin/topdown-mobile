@@ -5,6 +5,7 @@ using UniRx;
 using UniRx.Triggers;
 // using UniRx.Tuple;
 using Unity.Profiling;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(Animator), typeof(Rigidbody))]
 public class Character : MonoBehaviour
@@ -20,6 +21,8 @@ public class Character : MonoBehaviour
     public ReactiveProperty<int> MaxHp = new ReactiveProperty<int>(100);
 
     private ReactiveProperty<GameObject> _target = new ReactiveProperty<GameObject>(null);
+
+    public ReactiveProperty<CharacterTag> Tag = new ReactiveProperty<CharacterTag>(CharacterTag.Enemy);
     
 
     void Awake()
@@ -49,7 +52,6 @@ public class Character : MonoBehaviour
             } else {
                 animator.SetInteger("HasWeapon", (int)newWeapon.GetWeaponType());
             }
-            
         });
     }
 
@@ -62,12 +64,11 @@ public class Character : MonoBehaviour
         animator.SetFloat("Speed", dir.magnitude);
 
         rigidbody.MovePosition(transform.position + dir * m_Speed * WorldTimeSystem.GetDeltaTime());
-        // _rigidbody.MoveRotation(transform.position + dir * Time.deltaTime * m_Speed);
-        // transform.LookAt(transform, transform.position + dir);
-        if (dir.magnitude > 0) {
+
+        if (dir.magnitude > 0 && (_target.Value == null || _target.Value.gameObject == null)) {
             Quaternion desired_rot = Quaternion.LookRotation(dir);
             Quaternion rot = Quaternion.Slerp(transform.rotation, desired_rot, 0.2f);
-            // rigidbody.MoveRotation( rot);
+            rigidbody.MoveRotation( rot);
         }
     }
 

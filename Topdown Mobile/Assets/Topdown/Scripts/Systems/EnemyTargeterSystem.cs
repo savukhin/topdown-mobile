@@ -23,6 +23,9 @@ public class EnemyTargeterSystem : BaseSystem<EnemyTargeterSystem>
         // TODO: job + burst
         foreach (var enemy in _enemies)
         {
+            if (enemy == null)
+                continue;
+                
             Vector3 vec = enemy.transform.position - position;
             float dot = Vector3.Dot(direction, vec);
             dot = Mathf.Abs(dot);
@@ -36,7 +39,9 @@ public class EnemyTargeterSystem : BaseSystem<EnemyTargeterSystem>
             }
         }
 
-        _prevEnemy.Value?.SetChosen(false);
+        if (_prevEnemy.Value != null && _prevEnemy.Value.gameObject != null)
+            _prevEnemy.Value?.SetChosen(false);
+            
         result?.SetChosen(true);
         _prevEnemy.Value = result;
 

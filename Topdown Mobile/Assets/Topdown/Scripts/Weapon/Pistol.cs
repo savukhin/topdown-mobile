@@ -21,7 +21,8 @@ public class Pistol : IWeapon
 
         desiredShotTime = Time.time + _fireDelaySec;
         
-        Instantiate(_bullet, getBulletStartPosition(), getBulletStartRotation(targetPosition));
+        IBullet bullet = Instantiate(_bullet, getBulletStartPosition(), getBulletStartRotation(targetPosition));
+        bullet.SetCharacterTag(character.Tag.Value);
     }
 
     public override WeaponType GetWeaponType()

@@ -12,6 +12,10 @@ public class Player : BasePlayer
     private System.IDisposable fireSubsription;
     private System.IDisposable currentHPSubscription;
 
+    void Awake() {
+        _character.Tag.Value = CharacterTag.Player;
+    }
+
     void OnEnable() {
         fireSubsription = MessageBroker.Default.Receive<PlayerFireMessage>().Subscribe((PlayerFireMessage _) => { Fire(); });
         currentHPSubscription = _character.CurrentHp.Subscribe((hp) => {});
@@ -23,7 +27,7 @@ public class Player : BasePlayer
         currentHPSubscription.Dispose();
     }
 
-    void Update() {
+    void Move() {
         #if UNITY_ANDROID 
             _character.SetSpeed(_moveJoystick.Direction);
         #else
@@ -32,7 +36,9 @@ public class Player : BasePlayer
 
             _character.SetSpeed(new Vector2(x, y));
         #endif
+    }
 
+    void Targeting() {
         Vector3 dir = new (_fireJoystick.Direction.x, 0, _fireJoystick.Direction.y);
         Debug.DrawRay(_character.transform.position, dir, Color.red, 1, true);
 
@@ -40,10 +46,14 @@ public class Player : BasePlayer
             Enemy enemy = EnemyTargeterSystem.Instance.TargetEnemy(_character.transform.position, dir);
 
             if (enemy) {
-                // _character.Fire();
                 _character.SetTarget(enemy.gameObject);
             }
         }
+    }
+
+    void Update() {
+        Move();
+        Targeting();
     }
 
     void Fire() {
