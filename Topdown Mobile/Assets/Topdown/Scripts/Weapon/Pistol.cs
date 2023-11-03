@@ -13,7 +13,7 @@ public class Pistol : IWeapon
 
     private float desiredShotTime = 0;
 
-    public override void Fire(Character character)
+    public override void Fire(Character character, Vector3 targetPosition)
     {
         if (Time.time < desiredShotTime) {
             return;
@@ -21,7 +21,7 @@ public class Pistol : IWeapon
 
         desiredShotTime = Time.time + _fireDelaySec;
         
-        Instantiate(_bullet, getBulletStartPosition(), getBulletStartRotation());
+        Instantiate(_bullet, getBulletStartPosition(), getBulletStartRotation(targetPosition));
     }
 
     public override WeaponType GetWeaponType()
@@ -44,10 +44,14 @@ public class Pistol : IWeapon
         return transform.position + transform.rotation * _firePoint;
     }
 
-    private Quaternion getBulletStartRotation() {
-        Vector3 euler = transform.rotation.eulerAngles;
-        euler.z = 0;
-        euler.x = 0;
-        return Quaternion.Euler(euler);
+    private Quaternion getBulletStartRotation(Vector3 targetPosition) {
+        // Vector3 euler = transform.rotation.eulerAngles;
+        // euler.z = 0;
+        // euler.x = 0;
+        // return Quaternion.Euler(euler);
+        Vector3 startPos = getBulletStartPosition();
+        Vector3 dir = targetPosition - startPos;
+        dir.y = startPos.y;
+        return Quaternion.LookRotation(dir);
     }
 }

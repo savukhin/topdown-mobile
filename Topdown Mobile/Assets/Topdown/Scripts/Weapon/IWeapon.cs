@@ -2,7 +2,7 @@ using UnityEngine;
 
 public abstract class IWeapon: MonoBehaviour {
     abstract public void OnPut(Character character);
-    abstract public void Fire(Character character);
+    abstract public void Fire(Character character, Vector3 targetPosition);
     abstract public WeaponType GetWeaponType();
 }
 

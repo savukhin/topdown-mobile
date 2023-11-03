@@ -1,7 +1,5 @@
 using UniRx;
 using UnityEngine;
-using UnityEngine.UI;
-using UniRx;
 using UniRx.Triggers;
 
 public class UIController : MonoBehaviour
@@ -10,27 +8,20 @@ public class UIController : MonoBehaviour
     private Player _player;
     [SerializeField]
     public ProgressBar _hpBar;
-    // public Button fireButton;
-    public MyButton fireButton;
+    public RxJoystick fireJoystick;
 
     void Awake()
     {
-        fireButton.OnPointerDown().Subscribe(_ => {
-            Debug.Log("Pointer down");
+        fireJoystick.OnDownAsObservable().Subscribe(_ => {
             WorldTimeSystem.Instance.StartAnim();
         });
 
-        fireButton.OnPointerDown()
-            .SelectMany(_ => this.UpdateAsObservable())
-            .SampleFrame(1)
-            .TakeUntil(fireButton.OnPointerUp())
-            .RepeatUntilDestroy(this)
+        fireJoystick.OnMoveAsObservable()
             .Subscribe(x => {
                 MessageBroker.Default.Publish(new PlayerFireMessage());
             });
 
-        fireButton.OnPointerUp().Subscribe(_ => {
-            Debug.Log("Pointer up");
+        fireJoystick.OnUpAsObservable().Subscribe(_ => {
             WorldTimeSystem.Instance.StopAnim();
         });
 

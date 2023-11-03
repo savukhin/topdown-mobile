@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
+using UniRx.Triggers;
+// using UniRx.Tuple;
 using Unity.Profiling;
-using System;
 
 [RequireComponent(typeof(Animator), typeof(Rigidbody))]
 public class Character : MonoBehaviour
@@ -15,14 +16,32 @@ public class Character : MonoBehaviour
     public float m_Speed = 5f;
 
     public ReactiveProperty<IWeapon> Weapon;
-    public ReactiveProperty<int> CurrentHp;
-    public ReactiveProperty<int> MaxHp;
+    public ReactiveProperty<int> CurrentHp = new ReactiveProperty<int>(100);
+    public ReactiveProperty<int> MaxHp = new ReactiveProperty<int>(100);
+
+    private ReactiveProperty<GameObject> _target = new ReactiveProperty<GameObject>(null);
     
 
     void Awake()
     {
         animator = gameObject.GetComponent<Animator>();
         rigidbody = gameObject.GetComponent<Rigidbody>();
+
+        _target.Subscribe(x => {
+            if (x == null) return;
+
+            x.transform
+                .ObserveEveryValueChanged(x => x.position)
+                .SelectMany(targetPosition => transform.ObserveEveryValueChanged(x => x.position)
+                , (target, character) => System.Tuple.Create(target, character))
+                .Subscribe((t) => {
+                    Vector3 target = t.Item1;
+                    Vector3 character = t.Item2;
+                    Quaternion desired_rot = Quaternion.LookRotation(target - character);
+                    Quaternion rot = Quaternion.Slerp(transform.rotation, desired_rot, 0.2f);
+                    rigidbody.MoveRotation( rot);
+                });
+        });
 
         Weapon.Subscribe((IWeapon newWeapon) => {
             if (newWeapon == null) {
@@ -35,7 +54,7 @@ public class Character : MonoBehaviour
     }
 
     public void Fire() {
-        Weapon.Value.Fire(this);
+        Weapon.Value.Fire(this, _target.Value ? _target.Value.transform.position : transform.position + transform.forward);
     }
 
     public void SetSpeed(Vector2 direction) {
@@ -47,10 +66,13 @@ public class Character : MonoBehaviour
         // transform.LookAt(transform, transform.position + dir);
         if (dir.magnitude > 0) {
             Quaternion desired_rot = Quaternion.LookRotation(dir);
-            // Mathf.Lerp()
             Quaternion rot = Quaternion.Slerp(transform.rotation, desired_rot, 0.2f);
-            rigidbody.MoveRotation( rot);
+            // rigidbody.MoveRotation( rot);
         }
+    }
+
+    public void SetTarget(GameObject target) {
+        _target.Value = target;
     }
 
     public void TakeDamage(int damage) {

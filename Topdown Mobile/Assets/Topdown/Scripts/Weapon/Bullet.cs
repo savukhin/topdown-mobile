@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// [RequireComponent(typeof(CharacterController), typeof(Collider))]
+[RequireComponent(typeof(Rigidbody))]
 public class Bullet : IBullet
 {
     [SerializeField]
@@ -20,7 +20,6 @@ public class Bullet : IBullet
     void OnCollisionEnter(Collision collision)
     {
         Character character = collision.collider.GetComponent<Character>();
-        Debug.Log("collide with " + collision.collider.name + " character = " + character);
         if (character != null) {
             character.TakeDamage(damage);
         }

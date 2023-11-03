@@ -6,23 +6,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 using MEC;
 
-public class WorldTimeSystem : MonoBehaviour
+public class WorldTimeSystem : BaseSystem<WorldTimeSystem>
 {
-    static WorldTimeSystem _instance;
- 
-    public static WorldTimeSystem Instance
-    {
-        get
-        {
-            if (_instance == null) {
-                Debug.LogError("WorldTimeSystem does not exists at scene, creating");
-                GameObject go = new GameObject();
-                _instance = go.AddComponent<WorldTimeSystem>();
-            }
-            return _instance;
-        }
-    }
-
     void Awake() {   
         _instance = this; 
     }
